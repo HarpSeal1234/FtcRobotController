@@ -29,13 +29,10 @@
 
 package org.firstinspires.ftc.teamcode;
 
-import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 /*
@@ -67,29 +64,13 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 // port 1 223 vertical2
 // port 0 vertical1 1170
 //port 2 vertical3 1170
-@TeleOp(name = "Control Linear Slide By Encoder", group = "Robot")
-public class RobotAutoDriveByEncoder_Linear extends LinearOpMode {
+@TeleOp(name = "Vertical One Test", group = "Robot")
+public class Vertical1Test extends LinearOpMode {
 
     /* Declare OpMode members. */
     private DcMotorEx vertical1 = null;
-    private DcMotorEx vertical2 = null;
-    private DcMotorEx vertical3 = null;
-
-    private ElapsedTime runtime = new ElapsedTime();
-
-    // Calculate the COUNTS_PER_INCH for your specific drive train.
-    // Go to your motor vendor website to determine your motor's COUNTS_PER_MOTOR_REV
-    // For external drive gearing, set DRIVE_GEAR_REDUCTION as needed.
-    // For example, use a value of 2.0 for a 12-tooth spur gear driving a 24-tooth spur gear.
-    // This is gearing DOWN for less speed and more torque.
-    // For gearing UP, use a gear ratio less than 1.0. Note this will affect the direction of wheel rotation.
-    static final double COUNTS_PER_MOTOR_REV = 1440;    // eg: TETRIX Motor Encoder
-    static final double DRIVE_GEAR_REDUCTION = 1.0;     // No External Gearing.
-    static final double WHEEL_DIAMETER_INCHES = 4.0;     // For figuring circumference
-    static final double COUNTS_PER_INCH = (COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION) /
-            (WHEEL_DIAMETER_INCHES * 3.1415);
-    static final double DRIVE_SPEED = 0.6;
-    static final double TURN_SPEED = 0.5;
+//    private DcMotorEx vertical2 = null;
+//    private DcMotorEx vertical3 = null;
 
     //PIDF
     //VERTICAL ONE
@@ -100,7 +81,7 @@ public class RobotAutoDriveByEncoder_Linear extends LinearOpMode {
     private double verticalOnePosition = 5.0;
     private double verticalOneZeroPower = 0.0;
 
-
+/*
     //VERTICAL TWO
     private double verticalTwoZeroPower = 0.0;
     private double verticalTwoF = 10.782;
@@ -108,8 +89,9 @@ public class RobotAutoDriveByEncoder_Linear extends LinearOpMode {
     private double verticalTwokI = 0.0;
     private double verticalTwokD = 0.005;
     private double verticalTwoPosition = 5.0;
+*/
 
-
+    /*
 //VERTICAL THREE
     private double verticalThreeZeroPower = 0.0;
     private double verticalThreekP = 1.0;
@@ -117,7 +99,7 @@ public class RobotAutoDriveByEncoder_Linear extends LinearOpMode {
     private double verticalThreekD =  0.005;
     private double verticalThreeF = 10.782;
     private double verticalThreePosition = 5.0;
-
+*/
 
     @Override
     public void runOpMode() {
@@ -132,9 +114,10 @@ public class RobotAutoDriveByEncoder_Linear extends LinearOpMode {
 
         // Send telemetry message to indicate successful Encoder reset
         telemetry.addData("Starting at", "%7d :%7d",
-                vertical1.getCurrentPosition(),
-                vertical2.getCurrentPosition(),
-                vertical3.getCurrentPosition());
+                vertical1.getCurrentPosition());
+//                vertical2.getCurrentPosition(),
+//                vertical3.getCurrentPosition());
+
         telemetry.update();
 
         // Wait for the game to start (driver presses START)
@@ -142,56 +125,35 @@ public class RobotAutoDriveByEncoder_Linear extends LinearOpMode {
 
         while (opModeIsActive()) {
             int verticalOneTargetPosition = vertical1.getCurrentPosition();
-            int verticalThreeTargetPosition = vertical3.getCurrentPosition();
+//            int verticalTwoTargetPosition = vertical2.getCurrentPosition();
+//            int verticalThreeTargetPosition = vertical3.getCurrentPosition();
 
-            // Step through each leg of the path,
-            // Note: Reverse movement is obtained by setting a negative distance (not speed)
-        int verticalTwoTargetPosition = vertical2.getCurrentPosition();
-
-            // Determine new target position, and pass to motor controller
             if (gamepad1.y) {
                 verticalOneTargetPosition = verticalOneTargetPosition + 150;
-                verticalTwoTargetPosition = verticalTwoTargetPosition + 150;
-                verticalThreeTargetPosition = verticalThreeTargetPosition + 150;
+//                verticalTwoTargetPosition = verticalTwoTargetPosition + 150;
+//                verticalThreeTargetPosition = verticalThreeTargetPosition + 150;
             } else if (gamepad1.a) {
                 verticalOneTargetPosition = verticalOneTargetPosition - 150;
-                verticalTwoTargetPosition = verticalTwoTargetPosition - 150;
-                verticalThreeTargetPosition = verticalThreeTargetPosition - 150;
+//                verticalTwoTargetPosition = verticalTwoTargetPosition - 150;
+//                verticalThreeTargetPosition = verticalThreeTargetPosition - 150;
             }else{
                 vertical1.setVelocity(0);
-                vertical2.setVelocity(0);
-                vertical3.setVelocity(0);
+//                vertical2.setVelocity(0);
+//                vertical3.setVelocity(0);
             }
             vertical1.setTargetPosition(verticalOneTargetPosition);
-            vertical2.setTargetPosition(verticalTwoTargetPosition);
-            vertical3.setTargetPosition(verticalThreeTargetPosition);
+//            vertical2.setTargetPosition(verticalTwoTargetPosition);
+//            vertical3.setTargetPosition(verticalThreeTargetPosition);
 
             // Turn On RUN_TO_POSITION
             vertical1.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            vertical2.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            vertical3.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+//            vertical2.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+//            vertical3.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
-            // reset the timeout time and start motion.
-//            runtime.reset();
             vertical1.setVelocity(2900);
-            vertical2.setVelocity(2900);
-            vertical3.setVelocity(2900);
+//            vertical2.setVelocity(2900);
+//            vertical3.setVelocity(2900);
 
-            //            while(vertical2.isBusy()){
-//                telemetry.addData("Running to", " %7d :%7d", verticalTwoTargetPosition, verticalTwoTargetPosition);
-//                telemetry.addData("Currently at", " at %7d :%7d",
-//                        vertical2.getCurrentPosition(), vertical2.getCurrentPosition());
-//                telemetry.update();
-//            }
-////            vertical1.setVelocity(Math.abs(2000));
-//            vertical2.setVelocity(Math.abs(speed));
-
-            // keep looping while we are still active, and there is time left, and both motors are running.
-            // Note: We use (isBusy() && isBusy()) in the loop test, which means that when EITHER motor hits
-            // its target position, the motion will stop.  This is "safer" in the event that the robot will
-            // always end the motion as soon as possible.
-            // However, if you require that BOTH motors have finished their moves before the robot continues
-            // onto the next step, use (isBusy() || isBusy()) in the loop test.
 
 
             // Stop all motion;
@@ -217,8 +179,8 @@ public class RobotAutoDriveByEncoder_Linear extends LinearOpMode {
 
     public void initMotors() {
         initVertical1();
-        initVertical2();
-        initVertical3();
+//        initVertical2();
+//        initVertical3();
     }
 
     public void initVertical1() {
@@ -230,7 +192,7 @@ public class RobotAutoDriveByEncoder_Linear extends LinearOpMode {
         vertical1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         vertical1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
     }
-
+/*
     public void initVertical2() {
         vertical2 = hardwareMap.get(DcMotorEx.class, "vertical2");
         vertical2.setVelocityPIDFCoefficients(verticalTwokP, verticalTwokI, verticalTwokD, verticalTwoF);
@@ -239,7 +201,8 @@ public class RobotAutoDriveByEncoder_Linear extends LinearOpMode {
         vertical2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         vertical2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
     }
-
+*/
+    /*
     public void initVertical3() {
         vertical3 = hardwareMap.get(DcMotorEx.class, "vertical3");
         vertical3.setVelocityPIDFCoefficients(verticalThreekP, verticalThreekI, verticalThreekD, verticalThreeF);
@@ -248,5 +211,5 @@ public class RobotAutoDriveByEncoder_Linear extends LinearOpMode {
         vertical3.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         vertical3.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         vertical3.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-    }
+    }*/
 }
