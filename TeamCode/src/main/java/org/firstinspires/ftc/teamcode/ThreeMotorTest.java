@@ -33,6 +33,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
 /*
  * This OpMode illustrates the concept of driving a path based on encoder counts.
@@ -70,6 +71,7 @@ public class ThreeMotorTest extends LinearOpMode {
     private DcMotorEx vertical1 = null;
     private DcMotorEx vertical2 = null;
     private DcMotorEx vertical3 = null;
+    private DcMotorEx extendo = null;
 
     //PIDF
 
@@ -124,32 +126,42 @@ public class ThreeMotorTest extends LinearOpMode {
             int verticalOneTargetPosition = vertical1.getCurrentPosition();
             int verticalTwoTargetPosition = vertical2.getCurrentPosition();
             int verticalThreeTargetPosition = vertical3.getCurrentPosition();
+            extendo.setPower(0.0);
 
             if (gamepad1.y) {
-                verticalOneTargetPosition = verticalOneTargetPosition + 150;
-                verticalTwoTargetPosition = verticalTwoTargetPosition + 150;
-                verticalThreeTargetPosition = verticalThreeTargetPosition + 150;
+//                verticalOneTargetPosition = verticalOneTargetPosition + 150;
+//                verticalTwoTargetPosition = verticalTwoTargetPosition + 150;
+//                verticalThreeTargetPosition = verticalThreeTargetPosition + 150;
+                vertical1.setPower(1.0);
+                vertical2.setPower(1.0);
+                vertical3.setPower(1.0);
             } else if (gamepad1.a) {
-                verticalOneTargetPosition = verticalOneTargetPosition - 150;
-                verticalTwoTargetPosition = verticalTwoTargetPosition - 150;
-                verticalThreeTargetPosition = verticalThreeTargetPosition - 150;
+//                verticalOneTargetPosition = verticalOneTargetPosition - 150;
+//                verticalTwoTargetPosition = verticalTwoTargetPosition - 150;
+//                verticalThreeTargetPosition = verticalThreeTargetPosition - 150;
+                vertical1.setPower(-1.0);
+                vertical2.setPower(-1.0);
+                vertical3.setPower(-1.0);
             }else{
-                vertical1.setVelocity(0);
-                vertical2.setVelocity(0);
-                vertical3.setVelocity(0);
+//                vertical1.setVelocity(0);
+//                vertical2.setVelocity(0);
+//                vertical3.setVelocity(0);
+                vertical1.setPower(0.0);
+                vertical2.setPower(0.0);
+                vertical3.setPower(0.0);
             }
-            vertical1.setTargetPosition(verticalOneTargetPosition);
-            vertical2.setTargetPosition(verticalTwoTargetPosition);
-            vertical3.setTargetPosition(verticalThreeTargetPosition);
+//            vertical1.setTargetPosition(verticalOneTargetPosition);
+//            vertical2.setTargetPosition(verticalTwoTargetPosition);
+//            vertical3.setTargetPosition(verticalThreeTargetPosition);
 
-            // Turn On RUN_TO_POSITION
-            vertical1.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            vertical2.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            vertical3.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-
-            vertical1.setVelocity(2900);
-            vertical2.setVelocity(2900);
-            vertical3.setVelocity(2900);
+//            // Turn On RUN_TO_POSITION
+//            vertical1.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+//            vertical2.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+//            vertical3.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+//
+//            vertical1.setVelocity(2900);
+//            vertical2.setVelocity(2900);
+//            vertical3.setVelocity(2900);
 
 
 
@@ -178,32 +190,41 @@ public class ThreeMotorTest extends LinearOpMode {
         initVertical1();
         initVertical2();
         initVertical3();
+        initExtendo();
     }
     public void initVertical1() {
         vertical1 = hardwareMap.get(DcMotorEx.class, "vertical1");
-        vertical1.setVelocityPIDFCoefficients(verticalOnekP, verticalOnekI, verticalOnekD, verticalOneF);
-        vertical1.setDirection(DcMotor.Direction.FORWARD);
+//        vertical1.setVelocityPIDFCoefficients(verticalOnekP, verticalOnekI, verticalOnekD, verticalOneF);
+        vertical1.setDirection(DcMotor.Direction.REVERSE);
         vertical1.setPower(verticalOneZeroPower);
-        vertical1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        vertical1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        vertical1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        vertical1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+//        vertical1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        vertical1.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
     }
 
     public void initVertical2() {
         vertical2 = hardwareMap.get(DcMotorEx.class, "vertical2");
-        vertical2.setVelocityPIDFCoefficients(verticalTwokP, verticalTwokI, verticalTwokD, verticalTwoF);
-        vertical2.setDirection(DcMotor.Direction.REVERSE);
+//        vertical2.setVelocityPIDFCoefficients(verticalTwokP, verticalTwokI, verticalTwokD, verticalTwoF);
+        vertical2.setDirection(DcMotor.Direction.FORWARD);
         vertical2.setPower(verticalTwoZeroPower);
         vertical2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        vertical2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        vertical2.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
     }
     public void initVertical3() {
         vertical3 = hardwareMap.get(DcMotorEx.class, "vertical3");
-        vertical3.setVelocityPIDFCoefficients(verticalThreekP, verticalThreekI, verticalThreekD, verticalThreeF);
+//        vertical3.setVelocityPIDFCoefficients(verticalThreekP, verticalThreekI, verticalThreekD, verticalThreeF);
         vertical3.setDirection(DcMotor.Direction.REVERSE);
         vertical3.setPower(0);
-        vertical3.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        vertical3.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        vertical3.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        vertical3.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+//        vertical3.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        vertical3.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+    }
+
+    public void initExtendo() {
+        extendo = hardwareMap.get(DcMotorEx.class, "extendo");
+        extendo.setDirection(DcMotor.Direction.REVERSE);
+        extendo.setPower(0.0);
+        extendo.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        extendo.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
     }
 }

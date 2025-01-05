@@ -34,7 +34,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
-
+//Vertical1:REVERSE,VERTICAL2:FORWARD,Vertical3REVERSE,
 /*
  * This OpMode illustrates the concept of driving a path based on encoder counts.
  * The code is structured as a LinearOpMode
@@ -112,10 +112,7 @@ public class Vertical2Test extends LinearOpMode {
 
 
         // Send telemetry message to indicate successful Encoder reset
-        telemetry.addData("Starting at", "%7d :%7d",
-//                vertical1.getCurrentPosition());
-                vertical2.getCurrentPosition());
-//                vertical3.getCurrentPosition());
+        telemetry.addData("Current Position", "Current Position:", vertical2.getCurrentPosition());
 
         telemetry.update();
 
@@ -123,35 +120,24 @@ public class Vertical2Test extends LinearOpMode {
         waitForStart();
 
         while (opModeIsActive()) {
-//            int verticalOneTargetPosition = vertical1.getCurrentPosition();
             int verticalTwoTargetPosition = vertical2.getCurrentPosition();
-//            int verticalThreeTargetPosition = vertical3.getCurrentPosition();
 
             if (gamepad1.y) {
-//                verticalOneTargetPosition = verticalOneTargetPosition + 150;
-                verticalTwoTargetPosition = verticalTwoTargetPosition + 150;
-//                verticalThreeTargetPosition = verticalThreeTargetPosition + 150;
+//                verticalTwoTargetPosition = verticalTwoTargetPosition + 150;
+                vertical2.setPower(1.0);
             } else if (gamepad1.a) {
-//                verticalOneTargetPosition = verticalOneTargetPosition - 150;
-                verticalTwoTargetPosition = verticalTwoTargetPosition - 150;
-//                verticalThreeTargetPosition = verticalThreeTargetPosition - 150;
+//                verticalTwoTargetPosition = verticalTwoTargetPosition - 150;
+                vertical2.setPower(-1.0);
             }else{
-//                vertical1.setVelocity(0);
-                vertical2.setVelocity(0);
-//                vertical3.setVelocity(0);
+//                vertical2.setVelocity(0);
+                vertical2.setPower(0.0);
+
             }
-//            vertical1.setTargetPosition(verticalOneTargetPosition);
-            vertical2.setTargetPosition(verticalTwoTargetPosition);
-//            vertical3.setTargetPosition(verticalThreeTargetPosition);
+//            vertical2.setTargetPosition(verticalTwoTargetPosition);
 
-            // Turn On RUN_TO_POSITION
-//            vertical1.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            vertical2.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-//            vertical3.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+//            vertical2.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
-//            vertical1.setVelocity(2900);
-            vertical2.setVelocity(2900);
-//            vertical3.setVelocity(2900);
+//            vertical2.setVelocity(2900);
 
 
 
@@ -194,11 +180,12 @@ public class Vertical2Test extends LinearOpMode {
     */
     public void initVertical2() {
         vertical2 = hardwareMap.get(DcMotorEx.class, "vertical2");
-        vertical2.setVelocityPIDFCoefficients(verticalTwokP, verticalTwokI, verticalTwokD, verticalTwoF);
-        vertical2.setDirection(DcMotor.Direction.REVERSE);
+//        vertical2.setVelocityPIDFCoefficients(verticalTwokP, verticalTwokI, verticalTwokD, verticalTwoF);
+        vertical2.setDirection(DcMotor.Direction.FORWARD);
         vertical2.setPower(verticalTwoZeroPower);
         vertical2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        vertical2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+//        vertical2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        vertical2.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
     }
     /*
     public void initVertical3() {

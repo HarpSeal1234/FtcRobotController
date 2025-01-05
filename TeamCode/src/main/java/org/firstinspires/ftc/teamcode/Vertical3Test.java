@@ -110,7 +110,7 @@ public class Vertical3Test extends LinearOpMode {
 
 
         // Send telemetry message to indicate successful Encoder reset
-        telemetry.addData("Starting at", "%7d :%7d",
+        telemetry.addData("Starting at",
 //                vertical1.getCurrentPosition());
 //                vertical2.getCurrentPosition());
                 vertical3.getCurrentPosition());
@@ -121,35 +121,36 @@ public class Vertical3Test extends LinearOpMode {
         waitForStart();
 
         while (opModeIsActive()) {
-//            int verticalOneTargetPosition = vertical1.getCurrentPosition();
-//            int verticalTwoTargetPosition = vertical2.getCurrentPosition();
             int verticalThreeTargetPosition = vertical3.getCurrentPosition();
 
             if (gamepad1.y) {
+                vertical3.setPower(1.0);
 //                verticalOneTargetPosition = verticalOneTargetPosition + 150;
 //                verticalTwoTargetPosition = verticalTwoTargetPosition + 150;
-                verticalThreeTargetPosition = verticalThreeTargetPosition + 150;
+//                verticalThreeTargetPosition = verticalThreeTargetPosition + 150;
             } else if (gamepad1.a) {
+                vertical3.setPower(-1.0);
 //                verticalOneTargetPosition = verticalOneTargetPosition - 150;
 //                verticalTwoTargetPosition = verticalTwoTargetPosition - 150;
-                verticalThreeTargetPosition = verticalThreeTargetPosition - 150;
+//                verticalThreeTargetPosition = verticalThreeTargetPosition - 150;
             }else{
 //                vertical1.setVelocity(0);
 //                vertical2.setVelocity(0);
-                vertical3.setVelocity(0);
+//                vertical3.setVelocity(0);
+                vertical3.setPower(0.0);
             }
 //            vertical1.setTargetPosition(verticalOneTargetPosition);
 //            vertical2.setTargetPosition(verticalTwoTargetPosition);
-            vertical3.setTargetPosition(verticalThreeTargetPosition);
+//            vertical3.setTargetPosition(verticalThreeTargetPosition);
 
             // Turn On RUN_TO_POSITION
 //            vertical1.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 //            vertical2.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            vertical3.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+//            vertical3.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
 //            vertical1.setVelocity(2900);
 //            vertical2.setVelocity(2900);
-            vertical3.setVelocity(2900);
+//            vertical3.setVelocity(2900);
 
 
 
@@ -202,11 +203,11 @@ public class Vertical3Test extends LinearOpMode {
     */
     public void initVertical3() {
         vertical3 = hardwareMap.get(DcMotorEx.class, "vertical3");
-        vertical3.setVelocityPIDFCoefficients(verticalThreekP, verticalThreekI, verticalThreekD, verticalThreeF);
+//        vertical3.setVelocityPIDFCoefficients(verticalThreekP, verticalThreekI, verticalThreekD, verticalThreeF);
         vertical3.setDirection(DcMotor.Direction.REVERSE);
         vertical3.setPower(0);
         vertical3.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        vertical3.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        vertical3.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+//        vertical3.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        vertical3.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
     }
 }
