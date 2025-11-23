@@ -10,7 +10,7 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 @TeleOp(name="Max Velocity Test")
 public class MaxVelocityTest extends LinearOpMode {
 //Motor Variables
-    private DcMotorEx motorOne;
+    private DcMotorEx outtake1;
     private double motorOneCurrentVelocity = 0.0;
     private double motorOneMaxVelocity = 0.0;
 
@@ -35,15 +35,15 @@ public class MaxVelocityTest extends LinearOpMode {
     }
 //initialize motorOne
     public void initMotorOne() {
-        motorOne = hardwareMap.get(DcMotorEx.class, "vertical2");
-        motorOne.setDirection(DcMotor.Direction.FORWARD);
-        motorOne.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-        motorOne.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        outtake1 = hardwareMap.get(DcMotorEx.class, "outtake1");
+        outtake1.setDirection(DcMotor.Direction.FORWARD);
+        outtake1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        outtake1.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
     }
 
     public void runMotorOne() {
-        motorOne.setPower(1.0);
-        motorOneCurrentVelocity = motorOne.getVelocity();
+        outtake1.setPower(1.0);
+        motorOneCurrentVelocity = outtake1.getVelocity();
         if (motorOneCurrentVelocity > motorOneMaxVelocity) {
             motorOneMaxVelocity = motorOneCurrentVelocity;
         }
@@ -51,7 +51,7 @@ public class MaxVelocityTest extends LinearOpMode {
 
     public void motorTelemetry() {
         telemetry.log().clear();
-        telemetry.addData("Power", motorOne.getPower());
+        telemetry.addData("Power", outtake1.getPower());
         telemetry.addData("Max Velocity", motorOneMaxVelocity);
         telemetry.addData("Current Velocity", motorOneCurrentVelocity);
         telemetry.update();

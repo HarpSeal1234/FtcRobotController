@@ -13,12 +13,12 @@ public class MotorPID extends LinearOpMode {
     private double motorOneZeroPower = 0.0;
     private double motorOneMaxPower = 1.0;
     private double motorOneCurrentVelocity = 0.0;
-    private double motorOneTargetVelocity = 2000;
-    private double motorOneMaxVelocity = 2700;
+    private double motorOneTargetVelocity = 1600;
+    private double motorOneMaxVelocity = 2780;
 
 //PID Variables
     private double F =  32767/motorOneMaxVelocity; //12.1359
-    private double kP = 1.15;
+    private double kP = 0.0;
     private double kI = 0.0;
     private double kD = 0.00001;
     private double position = 5.0;
@@ -41,7 +41,7 @@ public class MotorPID extends LinearOpMode {
     }
 //initialize motorOne
     public void initMotorOne(double kP, double kI, double kD, double F, double position) {
-        motorOne = hardwareMap.get(DcMotorEx.class, "vertical2");
+        motorOne = hardwareMap.get(DcMotorEx.class, "outtake1");
         motorOne.setDirection(DcMotor.Direction.FORWARD);
         motorOne.setPower(motorOneZeroPower);
         motorOne.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);

@@ -29,12 +29,15 @@
 
 package org.firstinspires.ftc.teamcode;
 
-//import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.CRServo;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
-import com.qualcomm.robotcore.util.Range;
+import com.qualcomm.robotcore.util.Range;;
 
 
 /*
@@ -50,35 +53,43 @@ import com.qualcomm.robotcore.util.Range;
  * Remove or comment out the @Disabled line to add this OpMode to the Driver Station OpMode list
  */
 
-@TeleOp(name="Claw Test", group="Linear OpMode")
-//@Disabled
-public class Claw extends LinearOpMode {
+@TeleOp(name="velocityT", group="Linear OpMode")
+public class velocityOuttake extends LinearOpMode {
 
     // Declare OpMode members.
     private ElapsedTime runtime = new ElapsedTime();
-    private Servo claw;
+    private DcMotorEx outtake1 = null;
+    double targetOuttakeVelocity = 0.0;
+    boolean velocitySet = false;
+    double currentOuttakeVelocity = 0.0;
+//
+
     @Override
     public void runOpMode() {
         telemetry.addData("Status", "Initialized");
         telemetry.update();
 
-        claw = hardwareMap.get(Servo.class, "claw");
-        double clawPosition = 0.5;
-
-        claw.setPosition(Range.clip(clawPosition, 0.0, 1.0));
-
         // Initialize the hardware variables. Note that the strings used here as parameters
         // to 'get' must correspond to the names assigned during the robot configuration
         // step (using the FTC Robot Controller app on the phone).
-//        rightDrive = hardwareMap.get(DcMotor.class, "right_drive");
+
+        outtake1  = hardwareMap.get(DcMotorEx.class, "outtake1");
 
         // To drive forward, most robots need the motor on one side to be reversed, because the axles point in opposite directions.
         // Pushing the left stick forward MUST make robot go forward. So adjust these two lines based on your first test drive.
         // Note: The settings here assume direct drive on left and right wheels.  Gear Reduction or 90 Deg drives may require direction flips
-//        rightDrive.setDirection(DcMotor.Direction.FORWARD);
+
+        outtake1.setDirection(DcMotorEx.Direction.REVERSE);
+
+        outtake1.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
+        outtake1.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
+        outtake1.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
+        outtake1.setVelocity(targetOuttakeVelocity);
 
         // Wait for the game to start (driver presses START)
-        float step = 0.0001f;
+        double step = 7;
+//        float outtakeStep = 0.001f;
+
         waitForStart();
         runtime.reset();
 
@@ -87,33 +98,27 @@ public class Claw extends LinearOpMode {
 
             // Setup a variable for each drive wheel to save power level for telemetry
 
-            // Choose to drive using either Tank Mode, or POV Mode
-            // Comment out the method that's not used.  The default below is POV.
 
-            // POV Mode uses left stick to go forward, and right stick to turn.
-            // - This uses basic math to combine motions and is easier to drive straight.
-
-            if (gamepad1.a) {
-                clawPosition += step;
-                clawPosition = Range.clip(clawPosition, 0.5, 0.578);
-
-                claw.setPosition(clawPosition);
-
-            } else if (gamepad1.b) {
-                clawPosition -= step;
-                clawPosition = Range.clip(clawPosition, 0.5, 0.578);
-
-                claw.setPosition(clawPosition);
+//            targetOuttakeVelocity = outtake1.getVelocity();
+            if(gamepad1.a) {
+                targetOuttakeVelocity = targetOuttakeVelocity + step;
+                outtake1.setVelocity(targetOuttakeVelocity);
             }
+            else if(gamepad1.b) {
+                targetOuttakeVelocity = targetOuttakeVelocity - step;
+                outtake1.setVelocity(targetOuttakeVelocity);
+            }
+//            else if (gamepad1.x){
+//                targetOuttakeVelocity = 10.0;
+//            }
 
-            // Tank Mode uses one stick to control each wheel.
-            // - This requires no math, but it is hard to drive forward slowly and keep straight.
-            // leftPower  = -gamepad1.left_stick_y ;
-            // rightPower = -gamepad1.right_stick_y ;
+
+            // Show the elapsed game time and wheel power.
             telemetry.addData("Status", "Run Time: " + runtime.toString());
-            telemetry.addData("Current Position", "Position: " + clawPosition);
+            telemetry.addData("Target Velocity", targetOuttakeVelocity);
+            telemetry.addData("power", outtake1.getPower());
+            telemetry.addData("Outtake Velocity", outtake1.getVelocity());
             telemetry.update();
-
         }
     }
 }

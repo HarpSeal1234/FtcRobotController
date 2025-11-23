@@ -29,12 +29,11 @@
 
 package org.firstinspires.ftc.teamcode;
 
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.util.ElapsedTime;
-import com.qualcomm.robotcore.util.Range;
 
 
 /*
@@ -50,35 +49,39 @@ import com.qualcomm.robotcore.util.Range;
  * Remove or comment out the @Disabled line to add this OpMode to the Driver Station OpMode list
  */
 
-@TeleOp(name="Intake Lift Test", group="Linear OpMode")
-@Disabled
-public class IntakeLiftTest extends LinearOpMode {
+@TeleOp(name="October10Intake+Outtake", group="Linear OpMode")
+
+public class newRobotOuttake extends LinearOpMode {
 
     // Declare OpMode members.
     private ElapsedTime runtime = new ElapsedTime();
-    private Servo intakeLift;
+    private DcMotor outtake1 = null;
+    private DcMotor intake1 = null;
+    double outtakePower = 0.0;
+    double intakePower = 0.0;
+
     @Override
     public void runOpMode() {
         telemetry.addData("Status", "Initialized");
         telemetry.update();
 
-        intakeLift = hardwareMap.get(Servo.class, "intakeLift");
-        double intakeLiftPosition = 0.5;
-
-        intakeLift.setPosition(Range.clip(intakeLiftPosition, 0.0, 1.0));
-
         // Initialize the hardware variables. Note that the strings used here as parameters
         // to 'get' must correspond to the names assigned during the robot configuration
         // step (using the FTC Robot Controller app on the phone).
-//        rightDrive = hardwareMap.get(DcMotor.class, "right_drive");
+        outtake1  = hardwareMap.get(DcMotor.class, "outtake1");
+        intake1 = hardwareMap.get(DcMotor.class,"intake1");
 
         // To drive forward, most robots need the motor on one side to be reversed, because the axles point in opposite directions.
         // Pushing the left stick forward MUST make robot go forward. So adjust these two lines based on your first test drive.
         // Note: The settings here assume direct drive on left and right wheels.  Gear Reduction or 90 Deg drives may require direction flips
-//        rightDrive.setDirection(DcMotor.Direction.FORWARD);
+        outtake1.setDirection(DcMotor.Direction.REVERSE);
+        intake1.setDirection(DcMotorSimple.Direction.REVERSE);
+
+        outtake1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        intake1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
 
         // Wait for the game to start (driver presses START)
-        float step = 0.001f;
         waitForStart();
         runtime.reset();
 
@@ -87,33 +90,29 @@ public class IntakeLiftTest extends LinearOpMode {
 
             // Setup a variable for each drive wheel to save power level for telemetry
 
-            // Choose to drive using either Tank Mode, or POV Mode
-            // Comment out the method that's not used.  The default below is POV.
 
-            // POV Mode uses left stick to go forward, and right stick to turn.
-            // - This uses basic math to combine motions and is easier to drive straight.
+        if(gamepad1.a) {
+            outtakePower = 0.0;
+        } else if(gamepad1.b) {
+            outtakePower = outtakePower + 0.001;
+        } else if (gamepad1.x) {
+            outtakePower = outtakePower - 0.001;
+        } else if (gamepad1.right_bumper) {
+            intakePower = intakePower + 0.001;
+        } else if (gamepad1.left_bumper){
+            intakePower = 0.0;
+        }
+            outtake1.setPower(outtakePower);
+            intake1.setPower(intakePower);
 
-            if (gamepad1.a) {
-                intakeLiftPosition += step;
-                intakeLiftPosition = Range.clip(intakeLiftPosition, 0.31, 0.75);
 
-                intakeLift.setPosition(intakeLiftPosition);
-
-            } else if (gamepad1.b) {
-                intakeLiftPosition -= step;
-                intakeLiftPosition = Range.clip(intakeLiftPosition, 0.31, 0.75);
-
-                intakeLift.setPosition(intakeLiftPosition);
-            }
-
-            // Tank Mode uses one stick to control each wheel.
-            // - This requires no math, but it is hard to drive forward slowly and keep straight.
-            // leftPower  = -gamepad1.left_stick_y ;
-            // rightPower = -gamepad1.right_stick_y ;
+            // Show the elapsed game time and wheel power.
             telemetry.addData("Status", "Run Time: " + runtime.toString());
-            telemetry.addData("Current Position", "Position: " + intakeLiftPosition);
+            telemetry.addData("Outtake Power", "Outtake Power: " + outtakePower);
+            telemetry.addData("Intake Power", "Intake Power: " + intakePower);
             telemetry.update();
-
         }
     }
 }
+
+
