@@ -31,30 +31,27 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.CRServo;
-import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
-@TeleOp(name="individaul", group="Linear OpMode")
-public class IndividualTest extends LinearOpMode {
+@TeleOp(name="pivotTest", group="Linear OpMode")
+public class PivotTest extends LinearOpMode {
 
     // Declare OpMode members.
     private ElapsedTime runtime = new ElapsedTime();
-    private Servo blockerR;
+    private Servo pivot;
 
     @Override
     public void runOpMode() {
         telemetry.addData("Status", "Initialized");
         telemetry.update();
 
-        blockerR = hardwareMap.get(Servo.class, "blockerL");
-        double blockerPositionR = 0.5;
+        pivot = hardwareMap.get(Servo.class, "pivot");
 
-        blockerR.setPosition(Range.clip(blockerPositionR, 0.0, 1.0));
+        double pivotPosition = 0.5;
+
+        pivot.setPosition(Range.clip(pivotPosition, 0.0, 1.0));
 
         float step = 0.001f;
 
@@ -66,21 +63,15 @@ public class IndividualTest extends LinearOpMode {
         while (opModeIsActive()) {
 
              if (gamepad2.y) {
-//                blockerPositionR = 0.0;
-//                blockerR.setPosition(blockerPositionR);
-                blockerPositionR += step;
-                blockerR.setPosition(Range.clip(blockerPositionR, 0.0, 0.65));
-//                blockerPosition = Range.clip(blockerPosition, 0.0, 1.0);
+                pivotPosition += step;
+                pivot.setPosition(Range.clip(pivotPosition, 0.0, 0.65));
             } else if (gamepad2.a){
-//                blockerPositionR = 1.0;
-//                blockerR.setPosition(blockerPositionR);
-                blockerPositionR -= step;
-                blockerR.setPosition(Range.clip(blockerPositionR, 0.0, 0.65));
+                pivotPosition -= step;
+                pivot.setPosition(Range.clip(pivotPosition, 0.0, 0.65));
             }
-//            blockerR.setPosition(Range.clip(blockerPositionR, 0.0, 1.0));
 
             telemetry.addData("Status", "Run Time: " + runtime.toString());
-            telemetry.addData("blockerPosRIGHT", "Position: " + blockerPositionR);
+            telemetry.addData("blockerPosRIGHT", "Position: " + pivotPosition);
             telemetry.update();
         }
     }
