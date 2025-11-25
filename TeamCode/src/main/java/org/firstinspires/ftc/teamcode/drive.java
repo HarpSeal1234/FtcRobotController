@@ -60,7 +60,7 @@ public class drive extends LinearOpMode {
     private DcMotor frontLeft = null;
     private DcMotor backRight = null;
     private DcMotor backLeft = null;
-    private DcMotor extendo = null;
+//    private DcMotor extendo = null;
 
     @Override
     public void runOpMode() {
@@ -74,7 +74,7 @@ public class drive extends LinearOpMode {
         frontLeft = hardwareMap.get(DcMotor.class, "frontLeft");
         backRight  = hardwareMap.get(DcMotor.class, "backRight");
         backLeft = hardwareMap.get(DcMotor.class, "backLeft");
-        extendo = hardwareMap.get(DcMotor.class, "extendo");
+//        extendo = hardwareMap.get(DcMotor.class, "extendo");
 
 
         // To drive forward, most robots need the motor on one side to be reversed, because the axles point in opposite directions.
@@ -90,7 +90,7 @@ public class drive extends LinearOpMode {
         frontRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         backLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         backRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        extendo.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+//        extendo.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
 
         // Wait for the game to start (driver presses START)

@@ -29,6 +29,15 @@
 
 package org.firstinspires.ftc.teamcode;
 
+import static org.firstinspires.ftc.teamcode.OrcaRoboticsConstants.CLOSE_OUTTAKE_VELOCITY;
+import static org.firstinspires.ftc.teamcode.OrcaRoboticsConstants.FAR_OUTTAKE_VELOCITY;
+import static org.firstinspires.ftc.teamcode.OrcaRoboticsConstants.INTAKE_POWER;
+import static org.firstinspires.ftc.teamcode.OrcaRoboticsConstants.L_BLOCKER_DOWN;
+import static org.firstinspires.ftc.teamcode.OrcaRoboticsConstants.L_BLOCKER_UP;
+import static org.firstinspires.ftc.teamcode.OrcaRoboticsConstants.PUSH_POWER;
+import static org.firstinspires.ftc.teamcode.OrcaRoboticsConstants.R_BLOCKER_DOWN;
+import static org.firstinspires.ftc.teamcode.OrcaRoboticsConstants.R_BLOCKER_UP;
+
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -72,13 +81,8 @@ public class basicTest extends LinearOpMode {
     private CRServo pushR;
     private CRServo pushL;
     double targetOuttakeVelocity = 0.0;
-    double FAR_OUTTAKE_VELOCITY = 1500;
-    double CLOSE_OUTTAKE_VELOCITY = 1300; // 11.21_ 1400 too high
-    double FAR_PIVOT_POSITION = 0.73;
-    double CLOSE_PIVOT_POSITION = 0.30;
-    double PUSH_POWER = 0.9;
-    double R_BLOCKER_UP = 0.65;
-    double R_BLOCKER_DOWN = 0.0;
+    double FAR_PIVOT_POSITION = 0.7;
+    double CLOSE_PIVOT_POSITION = 0.3;
 
 
     private Servo pivot;
@@ -99,16 +103,16 @@ public class basicTest extends LinearOpMode {
         outtake1  = hardwareMap.get(DcMotorEx.class, "outtake1");
         intake1 = hardwareMap.get(DcMotor.class,"intake1");
 
-        blockerR = hardwareMap.get(Servo.class, "blockerL");
-        blockerL = hardwareMap.get(Servo.class, "blockerR");
+        blockerR = hardwareMap.get(Servo.class, "blockerR");
+        blockerL = hardwareMap.get(Servo.class, "blockerL");
         double blockerPositionR = R_BLOCKER_DOWN;
-        double blockerPositionL = 1.0;
+        double blockerPositionL = L_BLOCKER_DOWN;
 
         pushR = hardwareMap.get(CRServo.class, "pushR");
         pushL = hardwareMap.get(CRServo.class, "pushL");
 
         pivot = hardwareMap.get(Servo.class, "pivot");
-        double pivotPosition = CLOSE_PIVOT_POSITION;
+        double pivotPosition = FAR_PIVOT_POSITION;
 
         blockerR.setPosition(Range.clip(blockerPositionR, 0.0, 1.0));
         blockerL.setPosition(Range.clip(blockerPositionL, 0.0, 1.0));
@@ -148,91 +152,67 @@ public class basicTest extends LinearOpMode {
 
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
-
-            // Setup a variable for each drive wheel to save power level for telemetry
-
-
+//drive
             double y = gamepad1.left_stick_y; // Remember, Y stick is reversed!
             double x = -gamepad1.left_stick_x;
             double rx = -gamepad1.right_stick_x;
-//
+
             frontLeft.setPower(Range.clip((y + x + rx),-0.6,0.6));
             backLeft.setPower(Range.clip((y - x + rx),-0.6,0.6));
             frontRight.setPower(Range.clip((y - x - rx),-0.6,0.6));
             backRight.setPower(Range.clip((y + x - rx),-0.6,0.6));
 
+            //controls
             if(gamepad1.a) {
                 outtake1.setVelocity(FAR_OUTTAKE_VELOCITY);
-//                outtake1.setVelocity(Vrariables.);
             } else if(gamepad1.b) {
                 outtake1.setVelocity(CLOSE_OUTTAKE_VELOCITY);
             } else if (gamepad1.x) {
-//                pivotPosition = CLOSE_PIVOT_POSITION;
-                pivotPosition += step;
+                pivotPosition = CLOSE_PIVOT_POSITION;
                 pivotPosition = Range.clip(pivotPosition, 0.0, 1.0);
                 pivot.setPosition(pivotPosition);
             } else if (gamepad1.y) {
-//                pivotPosition = FAR_PIVOT_POSITION;
-                pivotPosition -= step;
+                pivotPosition = FAR_PIVOT_POSITION;
                 pivotPosition = Range.clip(pivotPosition, 0.0, 1.0);
                 pivot.setPosition(pivotPosition);
             } else if (gamepad2.y) {
                 blockerPositionR = R_BLOCKER_DOWN;
-//                blockerR.setPosition(blockerPositionR);
-//                blockerPositionR += step;
                 blockerR.setPosition(Range.clip(blockerPositionR, 0.0 , R_BLOCKER_UP));
-//                blockerPosition = Range.clip(blockerPosition, 0.0, 1.0);
             } else if(gamepad1.dpad_left){
-                intakePower = -1.0;
+                intakePower = -INTAKE_POWER;
             } else if (gamepad1.dpad_right) {
                 outtake1.setVelocity(0.0);
             } else if (gamepad2.a){
                 blockerPositionR = R_BLOCKER_UP;
-//                blockerR.setPosition(blockerPositionR);
-//                blockerPositionR -= step;
                 blockerR.setPosition(Range.clip(blockerPositionR, 0.0, R_BLOCKER_UP));
-//                blockerPosition += step;
-//                blockerPosition = Range.clip(blockerPosition, 0.0, 1.0);
             } else if (gamepad2.x) {
-                blockerPositionL = 1.0;
-//                blockerPositionL += step;
-//                blockerL.setPosition(blockerPositionL);
-                blockerL.setPosition(Range.clip(blockerPositionL, 0.0, 1.0));
+                blockerPositionL = L_BLOCKER_UP;
+                blockerL.setPosition(Range.clip(blockerPositionL, 0.0, L_BLOCKER_DOWN));
             } else if (gamepad2.b){
-                blockerPositionL = 0.15;
-//                blockerL.setPosition(blockerPositionL);
-//                blockerPositionL -= step;
-                blockerL.setPosition(Range.clip(blockerPositionL, 0.0, 1.0));
+                blockerPositionL = L_BLOCKER_DOWN;
+                blockerL.setPosition(Range.clip(blockerPositionL, 0.0, L_BLOCKER_DOWN));
             } else if (gamepad2.right_bumper) {
                 pushR.setPower(PUSH_POWER); // subtracting brings ball in
-//                pushR.setPosition(pushPositionR);
-            } else if (gamepad2.left_bumper){
-                pushR.setPower(0.0);
+            } else if (gamepad2.left_bumper) {
+                pushR.setPower(0.0); // subtracting brings ball in
             } else if (gamepad2.dpad_up) {
                 pushL.setPower(-PUSH_POWER); // subtracting brings ball in
-//                pushR.setPosition(pushPositionR);
-            }else if (gamepad2.dpad_down) {
-                pushL.setPower(0.0); // subtracting brings ball in
-//                pushR.setPosition(pushPositionR);
-            }else if (gamepad1.right_bumper) {
+            } else if (gamepad1.right_bumper) {
                 intakePower = 1.0;
                 pushR.setPower(PUSH_POWER); // subtracting brings ball in
+                pushL.setPower(-PUSH_POWER); // subtracting brings ball in
             } else if (gamepad1.left_bumper){
                 intakePower = 0.0;
                 pushR.setPower(0.0); // subtracting brings ball in
+                pushL.setPower(0.0); // subtracting brings ball in
             } else if (gamepad1.dpad_up){
-//                outtakePower+=outtakeStep;
-                targetOuttakeVelocity = targetOuttakeVelocity + outtakeStep;
-                outtake1.setVelocity(Range.clip(targetOuttakeVelocity,0.0,FAR_OUTTAKE_VELOCITY));
+                targetOuttakeVelocity = targetOuttakeVelocity + step;
+                outtake1.setVelocity(Range.clip(targetOuttakeVelocity,0.0, FAR_OUTTAKE_VELOCITY));
             }else if (gamepad1.dpad_down){
-//                outtakePower-=outtakeStep;
-                targetOuttakeVelocity = targetOuttakeVelocity - outtakeStep;
-                outtake1.setVelocity(Range.clip(targetOuttakeVelocity,0.0,FAR_OUTTAKE_VELOCITY));
+                targetOuttakeVelocity = targetOuttakeVelocity - step;
+                outtake1.setVelocity(Range.clip(targetOuttakeVelocity,0.0, FAR_OUTTAKE_VELOCITY));
             }
-//            outtake1.setPower(outtakePower);
             intake1.setPower(intakePower);
-//            blockerR.setPosition(Range.clip(blockerPositionR, 0.0, 1.0));
-
 //            pivot.setPosition(pivotPosition);
 //            blocker.setPosition(blockerPosition);
 

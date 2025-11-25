@@ -1,6 +1,4 @@
-package org.firstinspires.ftc.teamcode;
-
-import com.qualcomm.robotcore.hardware.PIDCoefficients;
+package org.firstinspires.ftc.teamcode.PIDF;
 
 public class PIDFController {
 

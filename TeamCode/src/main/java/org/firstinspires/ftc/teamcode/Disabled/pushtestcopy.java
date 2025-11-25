@@ -27,8 +27,9 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.Disabled;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -49,15 +50,15 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  * Remove or comment out the @Disabled line to add this OpMode to the Driver Station OpMode list
  */
 
-@TeleOp(name="October3_outtakeTest", group="Linear OpMode")
-
-public class outtake extends LinearOpMode {
+@TeleOp(name="push_upTest", group="Linear OpMode")
+@Disabled
+public class pushtestcopy extends LinearOpMode {
 
     // Declare OpMode members.
     private ElapsedTime runtime = new ElapsedTime();
-    private DcMotorEx outtake1 = null;
-    private DcMotorEx outtake2 = null;
+    private DcMotorEx pushUp = null;
     double power = 0.0;
+    int pushUpPosition = 0;
 
     @Override
     public void runOpMode() {
@@ -67,14 +68,19 @@ public class outtake extends LinearOpMode {
         // Initialize the hardware variables. Note that the strings used here as parameters
         // to 'get' must correspond to the names assigned during the robot configuration
         // step (using the FTC Robot Controller app on the phone).
-        outtake1  = hardwareMap.get(DcMotorEx.class, "outtake1");
-        outtake2 = hardwareMap.get(DcMotorEx.class, "outtake2");
+        pushUp = hardwareMap.get(DcMotorEx.class, "pushUp");
 
         // To drive forward, most robots need the motor on one side to be reversed, because the axles point in opposite directions.
         // Pushing the left stick forward MUST make robot go forward. So adjust these two lines based on your first test drive.
         // Note: The settings here assume direct drive on left and right wheels.  Gear Reduction or 90 Deg drives may require direction flips
-        outtake1.setDirection(DcMotorEx.Direction.REVERSE);
-        outtake2.setDirection(DcMotorEx.Direction.FORWARD);
+
+        /*pushUp.setDirection(DcMotorEx.Direction.REVERSE);
+        pushUp.setTargetPosition(pushUpPosition);
+        pushUp.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        pushUp.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        pushUp.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        pushUp.setTargetPosition(pushUpPosition);
+//        pushUp.setPower(0.7);*/
 
 //        outtake1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 //        outtake2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -85,27 +91,30 @@ public class outtake extends LinearOpMode {
 
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
-
+            pushUp.setDirection(DcMotorEx.Direction.REVERSE);
+            pushUp.setTargetPosition(pushUpPosition);
+            pushUp.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            pushUp.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            pushUp.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            pushUp.setTargetPosition(pushUpPosition);
             // Setup a variable for each drive wheel to save power level for telemetry
 
-        if(gamepad1.a) {
-            power = 0.0;
-            outtake1.setPower(power);
-            outtake2.setPower(power);
-        } else if(gamepad1.b) {
-            power = power + 0.0001;
-            outtake1.setPower(power);
-            outtake2.setPower(power);
-        } else if (gamepad1.x) {
-            power = power - 0.0001;
-            outtake1.setPower(power);
-            outtake2.setPower(power);
-        }
+            if(gamepad1.dpad_up ) {
+                pushUpPosition = pushUp.getCurrentPosition() + 10;
+                pushUp.setTargetPosition(pushUpPosition);
+            } else if(gamepad1.dpad_down) {
+                pushUpPosition = pushUp.getCurrentPosition() - 10;
+                pushUp.setTargetPosition(pushUpPosition);
+            } else if (gamepad1.dpad_right) {
+                pushUpPosition = 0;
+                pushUp.setTargetPosition(pushUpPosition);
+            }
+
 
 
             // Show the elapsed game time and wheel power.
             telemetry.addData("Status", "Run Time: " + runtime.toString());
-            telemetry.addData("Power", "Power: " + power);
+            telemetry.addData("Position", "Position: " + pushUp.getCurrentPosition());
             telemetry.update();
         }
     }

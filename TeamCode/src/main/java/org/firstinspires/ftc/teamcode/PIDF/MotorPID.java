@@ -1,10 +1,9 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.PIDF;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
 @TeleOp(name="MotorPID")
 public class MotorPID extends LinearOpMode {
@@ -14,13 +13,13 @@ public class MotorPID extends LinearOpMode {
     private double motorOneMaxPower = 1.0;
     private double motorOneCurrentVelocity = 0.0;
     private double motorOneTargetVelocity = 1600;
-    private double motorOneMaxVelocity = 2780;
+    private double motorOneMaxVelocity = 2800;
 
 //PID Variables
-    private double F =  32767/motorOneMaxVelocity; //12.1359
-    private double kP = 0.0;
-    private double kI = 0.0;
-    private double kD = 0.00001;
+    private double F = 32767/motorOneMaxVelocity;
+    private double kP = 1.6;
+    private double kI = kP * 0.1;
+    private double kD = kP * 0.01;
     private double position = 5.0;
 
     @Override
