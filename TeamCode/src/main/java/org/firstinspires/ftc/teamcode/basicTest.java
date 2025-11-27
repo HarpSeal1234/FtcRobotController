@@ -30,15 +30,18 @@
 package org.firstinspires.ftc.teamcode;
 
 import static org.firstinspires.ftc.teamcode.OrcaRoboticsConstants.CLOSE_OUTTAKE_VELOCITY;
+import static org.firstinspires.ftc.teamcode.OrcaRoboticsConstants.CLOSE_PIVOT_POSITION;
+import static org.firstinspires.ftc.teamcode.OrcaRoboticsConstants.DRIVE_POWER;
 import static org.firstinspires.ftc.teamcode.OrcaRoboticsConstants.FAR_OUTTAKE_VELOCITY;
+import static org.firstinspires.ftc.teamcode.OrcaRoboticsConstants.FAR_PIVOT_POSITION;
 import static org.firstinspires.ftc.teamcode.OrcaRoboticsConstants.INTAKE_POWER;
+import static org.firstinspires.ftc.teamcode.OrcaRoboticsConstants.INTAKE_ZERO_POWER;
 import static org.firstinspires.ftc.teamcode.OrcaRoboticsConstants.L_BLOCKER_DOWN;
 import static org.firstinspires.ftc.teamcode.OrcaRoboticsConstants.L_BLOCKER_UP;
 import static org.firstinspires.ftc.teamcode.OrcaRoboticsConstants.PUSH_POWER;
 import static org.firstinspires.ftc.teamcode.OrcaRoboticsConstants.R_BLOCKER_DOWN;
 import static org.firstinspires.ftc.teamcode.OrcaRoboticsConstants.R_BLOCKER_UP;
 
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.CRServo;
@@ -63,27 +66,37 @@ import com.qualcomm.robotcore.util.Range;
  * Remove or comment out the @Disabled line to add this OpMode to the Driver Station OpMode list
  */
 
-@TeleOp(name="decode1024", group="Linear OpMode")
+@TeleOp(name="AA_decode1024", group="Linear OpMode")
 public class basicTest extends LinearOpMode {
 
     // Declare OpMode members.
     private ElapsedTime runtime = new ElapsedTime();
-    private DcMotor frontRight = null;
-    private DcMotor frontLeft = null;
-    private DcMotor backRight = null;
-    private DcMotor backLeft = null;
+    private DcMotor rightFront = null;
+    private DcMotor leftFront = null;
+    private DcMotor rightBack = null;
+    private DcMotor leftBack = null;
     private DcMotorEx outtake1 = null;
     private DcMotor intake1 = null;
-//    double outtakePower = 0.0;
     double intakePower = 0.0;
     private Servo blockerR;
     private Servo blockerL;
     private CRServo pushR;
     private CRServo pushL;
     double targetOuttakeVelocity = 0.0;
-    double FAR_PIVOT_POSITION = 0.7;
-    double CLOSE_PIVOT_POSITION = 0.3;
 
+    // pidf
+    private double outtakeZeroPower = 0.0;
+    private double motorOneCurrentVelocity = 0.0;
+    private double motorOneTargetVelocity = 1300;
+    private double motorOneMaxVelocity = 2800;
+    private double F = 32767/motorOneMaxVelocity;
+    private double kP = 1.25;
+    private double kI = kP * 0.1;
+    private double kD = kP * 0.01;
+    private double position = 5.0;
+    double blockerPositionR = R_BLOCKER_DOWN;
+    double blockerPositionL = L_BLOCKER_DOWN;
+    double pivotPosition = FAR_PIVOT_POSITION;
 
     private Servo pivot;
 
@@ -92,40 +105,30 @@ public class basicTest extends LinearOpMode {
         telemetry.addData("Status", "Initialized");
         telemetry.update();
 
-        // Initialize the hardware variables. Note that the strings used here as parameters
-        // to 'get' must correspond to the names assigned during the robot configuration
-        // step (using the FTC Robot Controller app on the phone).
-        frontRight  = hardwareMap.get(DcMotor.class, "frontRight");
-        frontLeft = hardwareMap.get(DcMotor.class, "frontLeft");
-        backRight  = hardwareMap.get(DcMotor.class, "backRight");
-        backLeft = hardwareMap.get(DcMotor.class, "backLeft");
+        initHardware();
+        rightFront = hardwareMap.get(DcMotor.class, "rightFront");
+        leftFront = hardwareMap.get(DcMotor.class, "leftFront");
+        rightBack = hardwareMap.get(DcMotor.class, "rightBack");
+        leftBack = hardwareMap.get(DcMotor.class, "leftBack");
 
-        outtake1  = hardwareMap.get(DcMotorEx.class, "outtake1");
         intake1 = hardwareMap.get(DcMotor.class,"intake1");
 
         blockerR = hardwareMap.get(Servo.class, "blockerR");
         blockerL = hardwareMap.get(Servo.class, "blockerL");
-        double blockerPositionR = R_BLOCKER_DOWN;
-        double blockerPositionL = L_BLOCKER_DOWN;
 
         pushR = hardwareMap.get(CRServo.class, "pushR");
         pushL = hardwareMap.get(CRServo.class, "pushL");
 
         pivot = hardwareMap.get(Servo.class, "pivot");
-        double pivotPosition = FAR_PIVOT_POSITION;
 
         blockerR.setPosition(Range.clip(blockerPositionR, 0.0, 1.0));
         blockerL.setPosition(Range.clip(blockerPositionL, 0.0, 1.0));
-//        pushR.setPosition(Range.clip(pushPositionR,0.0,1.0));
         pivot.setPosition(Range.clip(pivotPosition, 0.0, 1.0));
 
-        // To drive forward, most robots need the motor on one side to be reversed, because the axles point in opposite directions.
-        // Pushing the left stick forward MUST make robot go forward. So adjust these two lines based on your first test drive.
-        // Note: The settings here assume direct drive on left and right wheels.  Gear Reduction or 90 Deg drives may require direction flips
-        frontLeft.setDirection(DcMotor.Direction.FORWARD);
-        frontRight.setDirection(DcMotor.Direction.REVERSE);
-        backLeft.setDirection(DcMotor.Direction.FORWARD);
-        backRight.setDirection(DcMotor.Direction.REVERSE);
+        leftFront.setDirection(DcMotor.Direction.FORWARD);
+        rightFront.setDirection(DcMotor.Direction.REVERSE);
+        leftBack.setDirection(DcMotor.Direction.FORWARD);
+        rightBack.setDirection(DcMotor.Direction.REVERSE);
 
         outtake1.setDirection(DcMotorEx.Direction.REVERSE);
         outtake1.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
@@ -138,10 +141,10 @@ public class basicTest extends LinearOpMode {
         outtake1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         intake1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-        frontLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        frontRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        backLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        backRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        leftFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        rightFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        leftBack.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        rightBack.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         // Wait for the game to start (driver presses START)
         float step = 0.001f;
@@ -152,20 +155,25 @@ public class basicTest extends LinearOpMode {
 
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
-//drive
+            //drive
             double y = gamepad1.left_stick_y; // Remember, Y stick is reversed!
             double x = -gamepad1.left_stick_x;
             double rx = -gamepad1.right_stick_x;
+            double leftFrontPower = Range.clip((y + x + rx),-DRIVE_POWER,DRIVE_POWER);
+            double leftBackPower = Range.clip((y - x + rx),-DRIVE_POWER,DRIVE_POWER);
+            double rightFrontPower = Range.clip((y - x - rx),-DRIVE_POWER,DRIVE_POWER);
+            double rightBackPower = Range.clip((y + x - rx),-DRIVE_POWER,DRIVE_POWER);
 
-            frontLeft.setPower(Range.clip((y + x + rx),-0.6,0.6));
-            backLeft.setPower(Range.clip((y - x + rx),-0.6,0.6));
-            frontRight.setPower(Range.clip((y - x - rx),-0.6,0.6));
-            backRight.setPower(Range.clip((y + x - rx),-0.6,0.6));
+
+            leftFront.setPower(leftFrontPower);
+            leftBack.setPower(leftBackPower);
+            rightFront.setPower(rightFrontPower);
+            rightBack.setPower(rightBackPower);
 
             //controls
-            if(gamepad1.a) {
+            if(gamepad2.left_bumper) {
                 outtake1.setVelocity(FAR_OUTTAKE_VELOCITY);
-            } else if(gamepad1.b) {
+            } else if(gamepad2.right_bumper) {
                 outtake1.setVelocity(CLOSE_OUTTAKE_VELOCITY);
             } else if (gamepad1.x) {
                 pivotPosition = CLOSE_PIVOT_POSITION;
@@ -180,7 +188,7 @@ public class basicTest extends LinearOpMode {
                 blockerR.setPosition(Range.clip(blockerPositionR, 0.0 , R_BLOCKER_UP));
             } else if(gamepad1.dpad_left){
                 intakePower = -INTAKE_POWER;
-            } else if (gamepad1.dpad_right) {
+            } else if (gamepad2.dpad_right) {
                 outtake1.setVelocity(0.0);
             } else if (gamepad2.a){
                 blockerPositionR = R_BLOCKER_UP;
@@ -191,42 +199,58 @@ public class basicTest extends LinearOpMode {
             } else if (gamepad2.b){
                 blockerPositionL = L_BLOCKER_DOWN;
                 blockerL.setPosition(Range.clip(blockerPositionL, 0.0, L_BLOCKER_DOWN));
-            } else if (gamepad2.right_bumper) {
-                pushR.setPower(PUSH_POWER); // subtracting brings ball in
-            } else if (gamepad2.left_bumper) {
-                pushR.setPower(0.0); // subtracting brings ball in
-            } else if (gamepad2.dpad_up) {
-                pushL.setPower(-PUSH_POWER); // subtracting brings ball in
             } else if (gamepad1.right_bumper) {
-                intakePower = 1.0;
+                intakePower = INTAKE_POWER;
                 pushR.setPower(PUSH_POWER); // subtracting brings ball in
                 pushL.setPower(-PUSH_POWER); // subtracting brings ball in
             } else if (gamepad1.left_bumper){
-                intakePower = 0.0;
-                pushR.setPower(0.0); // subtracting brings ball in
-                pushL.setPower(0.0); // subtracting brings ball in
-            } else if (gamepad1.dpad_up){
+                intakePower = INTAKE_ZERO_POWER;
+                pushR.setPower(INTAKE_ZERO_POWER); // subtracting brings ball in
+                pushL.setPower(INTAKE_ZERO_POWER); // subtracting brings ball in
+            } else if (gamepad2.dpad_up){
                 targetOuttakeVelocity = targetOuttakeVelocity + step;
                 outtake1.setVelocity(Range.clip(targetOuttakeVelocity,0.0, FAR_OUTTAKE_VELOCITY));
-            }else if (gamepad1.dpad_down){
+            }else if (gamepad2.dpad_down){
                 targetOuttakeVelocity = targetOuttakeVelocity - step;
                 outtake1.setVelocity(Range.clip(targetOuttakeVelocity,0.0, FAR_OUTTAKE_VELOCITY));
             }
             intake1.setPower(intakePower);
-//            pivot.setPosition(pivotPosition);
-//            blocker.setPosition(blockerPosition);
-
-            // Show the elapsed game time and wheel power.
-            telemetry.addData("Status", "Run Time: " + runtime.toString());
-//            telemetry.addData("Outtake Power", "Outtake Power: " + outtakePower);
-            telemetry.addData("Intake Power", "Intake Power: " + intakePower);
-            telemetry.addData("blockerPosLEFT", "Position: " + blockerPositionL);
-            telemetry.addData("blockerPosRIGHT", "Position: " + blockerPositionR);
-            telemetry.addData("Current Position", "Position: " + pivotPosition);
-            telemetry.addData("Target Velocity", targetOuttakeVelocity);
-            telemetry.addData("power", outtake1.getPower());
-            telemetry.addData("Outtake Velocity", outtake1.getVelocity());
-            telemetry.update();
+            motorTelemetry();
         }
     }
+    public void initHardware() {
+        initMotorOne(kP, kI, kD, F, position);
+    }
+
+    private void initMotorOne(double kP, double kI, double kD, double F, double position) {
+        outtake1  = hardwareMap.get(DcMotorEx.class, "outtake1");
+        outtake1.setDirection(DcMotor.Direction.FORWARD);
+        outtake1.setPower(outtakeZeroPower);
+        outtake1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        outtake1.setVelocityPIDFCoefficients(kP, kI, kD, F);
+        outtake1.setPositionPIDFCoefficients(position);
+        outtake1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        outtake1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+    }
+
+    public void motorTelemetry() {
+        telemetry.addData("Status", "Run Time: " + runtime.toString());
+        telemetry.addData("Intake Power", "Intake Power: " + intakePower);
+        telemetry.addData("blockerPosLEFT", "Position: " + blockerPositionL);
+        telemetry.addData("blockerPosRIGHT", "Position: " + blockerPositionR);
+        telemetry.addData("Current Position", "Position: " + pivotPosition);
+        telemetry.addData("Target Velocity", targetOuttakeVelocity);
+        telemetry.addData("power", outtake1.getPower());
+        telemetry.addData("Outtake Velocity", outtake1.getVelocity());
+        telemetry.addData("F", F);
+        telemetry.addData("kP", kP);
+        telemetry.addData("kI", kI);
+        telemetry.addData("kD","%.5f", kD);
+//        telemetry.addData("rightFront", rightFrontPower);
+//        telemetry.addData("leftFront", leftFrontPower);
+//        telemetry.addData("rightBack", rightBackPower);
+//        telemetry.addData("leftBack", leftBackPower);
+        telemetry.update();
+    }
 }
+
